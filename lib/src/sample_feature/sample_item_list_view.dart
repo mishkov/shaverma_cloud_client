@@ -24,25 +24,19 @@ class SampleItemListView extends StatefulWidget {
 
 class _SampleItemListViewState extends State<SampleItemListView> {
   Uri baseUri = Uri.parse('http://localhost:8080/');
-  late VideoPlayerController _controller;
+  VideoPlayerController? _controller;
   Future<List<String>>? _availableMoviesFetchFuture;
 
   @override
   void initState() {
     super.initState();
-    _controller = VideoPlayerController.network('http://localhost:8080/')
-      ..initialize().then((_) {
-        // Ensure the first frame is shown after the video is initialized, even before the play button has been pressed.
-        setState(() {});
-      });
-
     _availableMoviesFetchFuture = _getAvailableMovies();
   }
 
   @override
   void dispose() {
     super.dispose();
-    _controller.dispose();
+    _controller?.dispose();
   }
 
   Future<List<String>> _getAvailableMovies() async {
@@ -102,10 +96,25 @@ class _SampleItemListViewState extends State<SampleItemListView> {
                           shrinkWrap: true,
                           itemCount: movies?.length,
                           itemBuilder: (context, index) {
-                            return Card(
-                              child: Padding(
-                                padding: const EdgeInsets.all(8.0),
-                                child: Text(movies?[index] ?? 'Error'),
+                            return GestureDetector(
+                              onTap: () {
+                                final pathToMovie = baseUri
+                                    .replace(path: '/movies/${movies![index]}')
+                                    .toString();
+                                _controller?.dispose();
+                                _controller =
+                                    VideoPlayerController.network(pathToMovie)
+                                      ..initialize().then((_) {
+                                        _controller?.play();
+                                        // Ensure the first frame is shown after the video is initialized, even before the play button has been pressed.
+                                        setState(() {});
+                                      });
+                              },
+                              child: Card(
+                                child: Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: Text(movies?[index] ?? 'Error'),
+                                ),
                               ),
                             );
                           },
@@ -123,10 +132,10 @@ class _SampleItemListViewState extends State<SampleItemListView> {
           ),
           Expanded(
             flex: 3,
-            child: _controller.value.isInitialized
+            child: _controller?.value.isInitialized ?? false
                 ? AspectRatio(
-                    aspectRatio: _controller.value.aspectRatio,
-                    child: VideoPlayer(_controller),
+                    aspectRatio: _controller!.value.aspectRatio,
+                    child: VideoPlayer(_controller!),
                   )
                 : Container(),
           ),
@@ -135,13 +144,15 @@ class _SampleItemListViewState extends State<SampleItemListView> {
       floatingActionButton: FloatingActionButton(
         onPressed: () {
           setState(() {
-            _controller.value.isPlaying
-                ? _controller.pause()
-                : _controller.play();
+            _controller?.value.isPlaying ?? false
+                ? _controller?.pause()
+                : _controller?.play();
           });
         },
         child: Icon(
-          _controller.value.isPlaying ? Icons.pause : Icons.play_arrow,
+          _controller?.value.isPlaying ?? false
+              ? Icons.pause
+              : Icons.play_arrow,
         ),
       ),
     );
