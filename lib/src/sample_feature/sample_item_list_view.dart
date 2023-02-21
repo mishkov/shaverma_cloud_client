@@ -1,7 +1,8 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
-import 'package:video_player/video_player.dart';
+import 'package:media_kit/media_kit.dart';
+import 'package:media_kit_video/media_kit_video.dart';
 
 import '../settings/settings_view.dart';
 import 'sample_item.dart';
@@ -24,19 +25,36 @@ class SampleItemListView extends StatefulWidget {
 
 class _SampleItemListViewState extends State<SampleItemListView> {
   Uri baseUri = Uri.parse('http://localhost:8080/');
-  VideoPlayerController? _controller;
+
+  final player = Player();
+  VideoController? controller;
+
   Future<List<String>>? _availableMoviesFetchFuture;
 
   @override
   void initState() {
     super.initState();
+    Future.microtask(() async {
+      // Create a [VideoController] instance from `package:media_kit_video`.
+      // Pass the [handle] of the [Player] from `package:media_kit` to the [VideoController] constructor.
+      controller = await VideoController.create(player.handle);
+      player.streams.error.listen((event) {
+        print(event);
+      });
+      // Must be created before opening any media. Otherwise, a separate window will be created.
+      setState(() {});
+    });
     _availableMoviesFetchFuture = _getAvailableMovies();
   }
 
   @override
   void dispose() {
+    Future.microtask(() async {
+      // Release allocated resources back to the system.
+      await controller?.dispose();
+      await player.dispose();
+    });
     super.dispose();
-    _controller?.dispose();
   }
 
   Future<List<String>> _getAvailableMovies() async {
@@ -97,18 +115,14 @@ class _SampleItemListViewState extends State<SampleItemListView> {
                           itemCount: movies?.length,
                           itemBuilder: (context, index) {
                             return GestureDetector(
-                              onTap: () {
+                              onTap: () async {
                                 final pathToMovie = baseUri
                                     .replace(path: '/movies/${movies![index]}')
                                     .toString();
-                                _controller?.dispose();
-                                _controller =
-                                    VideoPlayerController.network(pathToMovie)
-                                      ..initialize().then((_) {
-                                        _controller?.play();
-                                        // Ensure the first frame is shown after the video is initialized, even before the play button has been pressed.
-                                        setState(() {});
-                                      });
+                                await player.open(
+                                  Playlist([Media(pathToMovie)]),
+                                );
+                                await player.play();
                               },
                               child: Card(
                                 child: Padding(
@@ -132,27 +146,18 @@ class _SampleItemListViewState extends State<SampleItemListView> {
           ),
           Expanded(
             flex: 3,
-            child: _controller?.value.isInitialized ?? false
-                ? AspectRatio(
-                    aspectRatio: _controller!.value.aspectRatio,
-                    child: VideoPlayer(_controller!),
-                  )
-                : Container(),
+            child: Video(controller: controller),
           ),
         ],
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
           setState(() {
-            _controller?.value.isPlaying ?? false
-                ? _controller?.pause()
-                : _controller?.play();
+            player.playOrPause();
           });
         },
         child: Icon(
-          _controller?.value.isPlaying ?? false
-              ? Icons.pause
-              : Icons.play_arrow,
+          !player.state.isPlaying ? Icons.pause : Icons.play_arrow,
         ),
       ),
     );
