@@ -1,21 +1,27 @@
 PODS:
   - FlutterMacOS (1.0.0)
-  - video_player_macos (0.0.1):
+  - media_kit_libs_macos (1.0.0):
+    - FlutterMacOS
+  - media_kit_video (0.0.1):
     - FlutterMacOS
 
 DEPENDENCIES:
   - FlutterMacOS (from `Flutter/ephemeral`)
-  - video_player_macos (from `Flutter/ephemeral/.symlinks/plugins/video_player_macos/macos`)
+  - media_kit_libs_macos (from `Flutter/ephemeral/.symlinks/plugins/media_kit_libs_macos/macos`)
+  - media_kit_video (from `Flutter/ephemeral/.symlinks/plugins/media_kit_video/macos`)
 
 EXTERNAL SOURCES:
   FlutterMacOS:
     :path: Flutter/ephemeral
-  video_player_macos:
-    :path: Flutter/ephemeral/.symlinks/plugins/video_player_macos/macos
+  media_kit_libs_macos:
+    :path: Flutter/ephemeral/.symlinks/plugins/media_kit_libs_macos/macos
+  media_kit_video:
+    :path: Flutter/ephemeral/.symlinks/plugins/media_kit_video/macos
 
 SPEC CHECKSUMS:
   FlutterMacOS: ae6af50a8ea7d6103d888583d46bd8328a7e9811
-  video_player_macos: 7a50b407d775a45392851b1218a9cf4be395cf7f
+  media_kit_libs_macos: bb5961c89b5e21ac730f8df4c3cfdc7ffa7f611e
+  media_kit_video: 87175bdc7eb65cb3fbc7b1ad62b471f1b196b095
 
 PODFILE CHECKSUM: 6eac6b3292e5142cfc23bdeb71848a40ec51c14c
 

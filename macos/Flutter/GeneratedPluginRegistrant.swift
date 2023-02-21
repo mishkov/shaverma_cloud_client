@@ -5,8 +5,10 @@
 import FlutterMacOS
 import Foundation
 
-import video_player_macos
+import media_kit_libs_macos
+import media_kit_video
 
 func RegisterGeneratedPlugins(registry: FlutterPluginRegistry) {
-  FLTVideoPlayerPlugin.register(with: registry.registrar(forPlugin: "FLTVideoPlayerPlugin"))
+  MediaKitLibsMacosPlugin.register(with: registry.registrar(forPlugin: "MediaKitLibsMacosPlugin"))
+  MediaKitVideoPlugin.register(with: registry.registrar(forPlugin: "MediaKitVideoPlugin"))
 }

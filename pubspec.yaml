@@ -15,8 +15,13 @@ dependencies:
   flutter_localizations:
     sdk: flutter
   http: ^0.13.5
-  video_player: ^2.5.1
-  video_player_macos: ^1.0.6
+  media_kit:
+   path: media_kit/media_kit
+  # For video support.
+  media_kit_video:
+    path: media_kit/media_kit_video
+  media_kit_libs_macos:
+    path: media_kit/media_kit_libs_macos
 
 dev_dependencies:
   flutter_test:
